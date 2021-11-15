@@ -21,10 +21,22 @@ const getOneUser = (username) => {
   return onlineuser.find((user) => user.username === username);
 };
 
+console.log(onlineuser);
+
 io.on("connection", (socket) => {
   socket.on("newUser", (username) => {
     addNewUser(username, socket.id);
     console.log(`${username} is online `);
+  });
+
+  socket.on("sendNotification", ({ senderName, receiverName, type }) => {
+    const receiver = getOneUser(receiverName);
+    io.to(receiver.socketId).emit("getNotification", {
+      senderName,
+      type,
+    });
+
+    console.log(type);
   });
 
   socket.on("disconnection", () => {
